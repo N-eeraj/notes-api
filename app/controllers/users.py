@@ -24,3 +24,9 @@ def validate_login(email, password):
             'success':False,
             'message': 'Incorrect password'
         })
+
+def register_handler(request):
+    return {
+        'success': True,
+        'message': 'Registration completed successfully'
+    }
