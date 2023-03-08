@@ -1,10 +1,13 @@
-# import fastapi & corsmiddleware
+# fastapi imports
 from fastapi import FastAPI, Request, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+
+# access user controller for token validation
+from .controllers import users as userControllers
 
 # import api routers
 from .routers import user
@@ -28,11 +31,15 @@ app.add_middleware(
 )
 app.include_router(user.router)
 
+# exception handling
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    errors = []
-    for error in exc.errors():
-        errors.append(f"{error['loc'][1]} {error['msg']}")
+    try:
+        errors = []
+        for error in exc.errors():
+            errors.append(f"{error['loc'][1]} {error['msg']}")
+    except:
+        errors = exc
     return JSONResponse(
         status_code = status.HTTP_422_UNPROCESSABLE_ENTITY,
         content = jsonable_encoder({
@@ -44,6 +51,28 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request, exc):
     return JSONResponse(exc.detail, status_code=exc.status_code)
+
+# middleware to check bearer token
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    if request['path'] not in ['/login', '/register', '/ping']:
+        headers = dict(request.headers)
+        if not validate_bearer_token(headers):
+            return JSONResponse(
+                status_code = 401,
+                content = jsonable_encoder({
+                    'message': 'User not logged in',
+                    'success': False
+                })
+            )
+    response = await call_next(request)
+    return response
+
+def validate_bearer_token(headers):
+    if 'authorization' not in headers.keys():
+        return False
+    token = headers['authorization'][7:]
+    return userControllers.validate_token(token)
 
 # ping api
 @app.get('/ping', tags=['Test'])

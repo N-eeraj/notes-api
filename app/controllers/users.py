@@ -67,3 +67,12 @@ def check_token_exist(token):
             return True
     except NoResultFound:
         False
+
+
+def validate_token(token):
+    try:
+        result = session.query(Token).filter(Token.token==token).one()
+        return result.user_id
+    except NoResultFound:
+        return False
+
