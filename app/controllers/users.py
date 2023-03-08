@@ -1,16 +1,25 @@
-# import httpexception, db, models
+# imports
 from fastapi import HTTPException
 from ..db import session
-from ..models.users import User
 import bcrypt
+import secrets
+
+# models
+from ..models.users import User
+from ..models.tokens import Token
 
 def login_handler(request):
-    validate_login(request.email, request.password)
+    # validate user using users table
+    id = validate_login(request.email, request.password)
+
+    # get bearer token
+    token = get_bearer_token(id)
 
     # return success message
     return {
         'success': True,
-        'message': 'Logged in successfully'
+        'message': 'Logged in successfully',
+        'token': token
     }
 
 def validate_login(email, password):
@@ -29,13 +38,39 @@ def validate_login(email, password):
             'success':False,
             'message': 'Incorrect password'
         })
+    return results[0].id
 
 def register_handler(request):
+    # check if email already exist in users table
+
+
+    # encrypt password and save to users table
     hashed_password = bcrypt.hashpw(bytes(request.password, 'utf-8'), bcrypt.gensalt())
     user = User(request.email, hashed_password)
     session.add(user)
     session.commit()
+
+    results = session.query(User).filter(User.email == request.email).all()
+    id = results[0].id
+
+    # get bearer token
+    token = get_bearer_token(id)
+
+    # return response
     return {
         'success': True,
-        'message': 'Registration completed successfully'
+        'message': 'Registration completed successfully',
+        'token': token
     }
+
+def get_bearer_token(id):
+    # generate bearer token
+    jwt_token = secrets.token_hex(32)
+
+    # save token to tokens table
+    token = Token(id, jwt_token)
+    session.add(token)
+    session.commit()
+
+    # return generated token
+    return jwt_token

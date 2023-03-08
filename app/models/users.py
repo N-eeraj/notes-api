@@ -6,8 +6,8 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column('id', Integer, primary_key=True)
-    email = Column('email', String(50), unique=True)
-    password = Column('password', String(128))
+    email = Column('email', String(50), unique=True, nullable=False)
+    password = Column('password', String(128), nullable=False)
 
     def __init__ (self, email, password):
         self.id = None
