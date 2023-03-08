@@ -1,50 +1,21 @@
-from pydantic import BaseModel, validator
+from sqlalchemy import Table, Column
+from sqlalchemy.sql.sqltypes import Integer, String
+from ..db import engine, Base
 
-# helper function to check for empty strings
-def validate_not_empty(value, key):
-    if value == '':
-        raise ValueError(f'{key.title()} cannot be empty')
+class User(Base):
+    __tablename__ = 'users'
 
-# login request basemodel
-class Login(BaseModel):
-    email: str
-    password: str
+    id = Column('id', Integer, primary_key=True)
+    email = Column('email', String(50), unique=True)
+    password = Column('password', String(128))
 
-    # email validator
-    @validator('email')
-    def email_not_empty(cls, value):
-        validate_not_empty(value, 'email')
-        return value
+    def __init__ (self, email, password):
+        self.id = None
+        self.email = email
+        self.password = password
 
-    # password validator
-    @validator('password')
-    def password_not_empty(cls, value):
-        validate_not_empty(value, 'password')
-        return value
+    def __repr__ (self):
+        return f'({self.id}, {self.email}, {self.password})'
 
 
-class Register(BaseModel):
-    email: str
-    password: str
-    confirm_password: str
-
-    # email validator
-    @validator('email')
-    def email_not_empty(cls, value):
-        validate_not_empty(value, 'email')
-        return value
-
-    # password validator
-    @validator('password')
-    def password_not_empty(cls, value):
-        validate_not_empty(value, 'password')
-        if len(value) < 8:
-            raise ValueError('Password must be atleast 8 characters long')
-        return value
-
-    # confirm password validator
-    @validator('confirm_password')
-    def confirm_password_not_empty(cls, value, values):
-        if 'password' in values and values['password'] != value:
-            raise ValueError('Passwords not matching')
-        return value
+Base.metadata.create_all(bind=engine)
