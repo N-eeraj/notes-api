@@ -76,3 +76,7 @@ def validate_token(token):
     except NoResultFound:
         return False
 
+
+def remove_token_by_token(token):
+    session.query(Token).filter(Token.token==token).delete()
+    session.commit()

@@ -1,9 +1,11 @@
 # import apirouter
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
-# import model
+# import schemas & controllers
 from ..schemas import users as userSchemas
 from ..controllers import users as userControllers
+
+from ..utils import get_user_id
 
 # initialize router
 router = APIRouter()
@@ -42,4 +44,16 @@ async def register(request: userSchemas.Register):
         'success': True,
         'message': 'Registration completed successfully',
         'token': token
+    }
+
+# logout api
+@router.post('/logout', tags=['Users'])
+async def logout(request: Request):
+    token = get_user_id(request)['token']
+    userControllers.remove_token_by_token(token)
+
+    # return response
+    return {
+        'success': True,
+        'message': 'Logout successfull'
     }
