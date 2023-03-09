@@ -65,10 +65,15 @@ async def logout(http_request: Request):
 @router.put('/update-password', tags=['Users'])
 async def update_password(http_request: Request, request: userSchemas.UpdatePassword):
     # get user id from request headers
-    user_id = get_user_id(http_request)['user_id']
+    user_details = get_user_id(http_request)
+    user_id = user_details['user_id']
+    token = user_details['token']
 
     # validate old password
     userControllers.validate_old_password(user_id, request.old_password)
+
+    # update new password in users table
+    userControllers.update_new_password(user_id, request.new_password)
 
     # return response
     return {

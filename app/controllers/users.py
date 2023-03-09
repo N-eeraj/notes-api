@@ -104,3 +104,12 @@ def validate_old_password(id, password):
             'success':False,
             'message': 'Incorrect password'
         })
+
+def update_new_password(id, password):
+    # generate hashed password
+    hashed_password = get_hashed_password(password)
+
+    # update password column in users table
+    user = session.query(User).filter(User.id==id).one()
+    user.password = hashed_password
+    session.commit()
