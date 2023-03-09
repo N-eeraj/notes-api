@@ -55,7 +55,7 @@ async def http_exception_handler(request, exc):
 # middleware to check bearer token
 @app.middleware("http")
 async def add_process_time_header(request: Request, call_next):
-    if request['path'] not in ['/login', '/register', '/ping']:
+    if request['path'] not in ['/docs', '/openapi.json', '/login', '/register', '/ping']:
         headers = dict(request.headers)
         if not validate_bearer_token(headers):
             return JSONResponse(

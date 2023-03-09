@@ -48,8 +48,11 @@ async def register(request: userSchemas.Register):
 
 # logout api
 @router.post('/logout', tags=['Users'])
-async def logout(request: Request):
-    token = get_user_id(request)['token']
+async def logout(http_request: Request):
+    # get token from request headers
+    token = get_user_id(http_request)['token']
+
+    # remove token from tokens table
     userControllers.remove_token_by_token(token)
 
     # return response
