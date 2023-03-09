@@ -25,8 +25,7 @@ def validate_login(email, password):
         })
 
     # check request password
-    incorrect_password = not bcrypt.checkpw(bytes(password, 'utf-8'), result.password.encode('utf-8'))
-    if incorrect_password:
+    if not bcrypt.checkpw(bytes(password, 'utf-8'), result.password.encode('utf-8')):
         # respond with error if password is incorrect
         raise HTTPException(status_code=401, detail={
             'success':False,
@@ -94,3 +93,14 @@ def remove_token_by_token(token):
     # delete token from tokens table
     session.query(Token).filter(Token.token==token).delete()
     session.commit()
+
+def validate_old_password(id, password):
+    # get hashed password of user by id from users table
+    result = session.query(User).filter(User.id==id).one()
+
+    if not bcrypt.checkpw(bytes(password, 'utf-8'), result.password.encode('utf-8')):
+        # respond with error if password is incorrect
+        raise HTTPException(status_code=401, detail={
+            'success':False,
+            'message': 'Incorrect password'
+        })

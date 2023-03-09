@@ -67,5 +67,11 @@ async def update_password(http_request: Request, request: userSchemas.UpdatePass
     # get user id from request headers
     user_id = get_user_id(http_request)['user_id']
 
-    print(user_id)
-    print(request)
+    # validate old password
+    userControllers.validate_old_password(user_id, request.old_password)
+
+    # return response
+    return {
+        'success': True,
+        'message': 'Password updated successfully'
+    }
