@@ -75,6 +75,9 @@ async def update_password(http_request: Request, request: userSchemas.UpdatePass
     # update new password in users table
     userControllers.update_new_password(user_id, request.new_password)
 
+    # remove all tokens of the users except current token
+    userControllers.remove_token_by_id(user_id, token)
+
     # return response
     return {
         'success': True,

@@ -113,3 +113,8 @@ def update_new_password(id, password):
     user = session.query(User).filter(User.id==id).one()
     user.password = hashed_password
     session.commit()
+
+def remove_token_by_id(id, token):
+    # delete all other tokens from tokens table
+    session.query(Token).filter(Token.user_id==id, Token.token!=token).delete()
+    session.commit()
