@@ -60,3 +60,12 @@ async def logout(http_request: Request):
         'success': True,
         'message': 'Logout successfull'
     }
+
+# update password api
+@router.put('/update-password', tags=['Users'])
+async def update_password(http_request: Request, request: userSchemas.UpdatePassword):
+    # get user id from request headers
+    user_id = get_user_id(http_request)['user_id']
+
+    print(user_id)
+    print(request)
