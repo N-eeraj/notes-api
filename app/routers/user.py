@@ -2,8 +2,8 @@
 from fastapi import APIRouter, Request
 
 # import schemas & controller
-from ..schemas import users as userSchemas
-from ..controllers import users as userController
+from ..schemas import users as user_schemas
+from ..controllers import users as user_controller
 
 # import user details helper
 from ..utils import get_user_details
@@ -13,12 +13,12 @@ router = APIRouter(tags=['Users'])
 
 # login api
 @router.post('/login')
-async def login(request: userSchemas.Login):
+async def login(request: user_schemas.Login):
     # validate user using users table
-    id = userController.validate_login(request.email, request.password)
+    id = user_controller.validate_login(request.email, request.password)
 
     # get bearer token
-    token = userController.get_bearer_token(id)
+    token = user_controller.get_bearer_token(id)
 
     # return success message
     return {
@@ -29,16 +29,16 @@ async def login(request: userSchemas.Login):
 
 # register api
 @router.post('/register')
-async def register(request: userSchemas.Register):
+async def register(request: user_schemas.Register):
     # check if email already exist in users table
-    userController.check_email_exist(request.email)
+    user_controller.check_email_exist(request.email)
 
     # encrypt password and save to users table
-    userController.create_user(request.email, request.password)
+    user_controller.create_user(request.email, request.password)
 
     # get bearer token
-    id = userController.validate_login(request.email, request.password)
-    token = userController.get_bearer_token(id)
+    id = user_controller.validate_login(request.email, request.password)
+    token = user_controller.get_bearer_token(id)
 
     # return response
     return {
@@ -54,7 +54,7 @@ async def logout(http_request: Request):
     token = get_user_details(http_request)['token']
 
     # remove token from tokens table
-    userController.remove_token_by_token(token)
+    user_controller.remove_token_by_token(token)
 
     # return response
     return {
@@ -64,20 +64,20 @@ async def logout(http_request: Request):
 
 # update password api
 @router.put('/update-password')
-async def update_password(http_request: Request, request: userSchemas.UpdatePassword):
+async def update_password(http_request: Request, request: user_schemas.UpdatePassword):
     # get user id from request headers
     user_details = get_user_details(http_request)
     user_id = user_details['user_id']
     token = user_details['token']
 
     # validate old password
-    userController.validate_old_password(user_id, request.old_password)
+    user_controller.validate_old_password(user_id, request.old_password)
 
     # update new password in users table
-    userController.update_new_password(user_id, request.new_password)
+    user_controller.update_new_password(user_id, request.new_password)
 
     # remove all tokens of the users except current token
-    userController.remove_token_by_id(user_id, token)
+    user_controller.remove_token_by_id(user_id, token)
 
     # return response
     return {

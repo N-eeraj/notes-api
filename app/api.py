@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 # access user controller for token validation
-from .controllers import users as userControllers
+from .controllers import users as user_controllers
 
 # import api routers
 from .routers import user, notes
@@ -74,7 +74,7 @@ def validate_bearer_token(headers):
     if 'authorization' not in headers.keys():
         return False
     token = headers['authorization'][7:]
-    return userControllers.validate_token(token)
+    return user_controllers.validate_token(token)
 
 # ping api
 @app.get('/ping', tags=['Test'])
