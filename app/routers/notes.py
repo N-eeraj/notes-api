@@ -29,7 +29,19 @@ async def create_note(request: noteSchemas.Note, http_request: Request):
     }
 
 # edit note api
-@router.post('/edit/{id}')
-async def edit_note(id: int, request: noteSchemas.Note):
-    print(id)
-    print(request)
+@router.put('/edit/{id}')
+async def edit_note(id: int, request: noteSchemas.Note, http_request: Request):
+    # get user id
+    user_id = get_user_details(http_request)['user_id']
+
+    # find note
+    note_id = noteController.find_note_and_update_title(id, user_id, request.title)
+
+    # update note file
+    noteController.create_note(note_id, request.body)
+
+    # return response
+    return {
+        'success': True,
+        'message': 'Note updated successfully'
+    } 
