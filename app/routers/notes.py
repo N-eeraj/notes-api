@@ -8,7 +8,32 @@ from ..controllers import notes as note_controller
 from ..utils import get_user_details
 
 # initialize router
-router = APIRouter(prefix='/notes' ,tags=['Notes'])
+router = APIRouter(prefix='/note' ,tags=['Notes'])
+
+# list all user notes
+@router.get('/list')
+async def list_notes(http_request: Request):
+    # get user id
+    user_id = get_user_details(http_request)['user_id']
+
+    # fetch all notes of the user
+    user_notes = note_controller.fetch_all_user_notes(user_id)
+
+    # get all details to return
+    notes = []
+    for note in user_notes:
+        notes.append({
+            'id': note.id,
+            'title': note.title,
+            'body': note_controller.read_note_file(note.id)
+        })
+
+    # return response
+    return {
+        'success': True,
+        'message': 'Notes fetched successfully',
+        'data': notes
+    }
 
 # create note api
 @router.post('/create')

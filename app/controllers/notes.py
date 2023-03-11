@@ -54,3 +54,7 @@ def delete_note_from_db(id, user_id):
 def delete_note(id):
     # delete note file
     os.remove(f'notes/{id}.txt')
+
+def fetch_all_user_notes(user_id):
+    # fetch all notes of a user
+    return session.query(Note).filter(Note.user_id==user_id).all()
