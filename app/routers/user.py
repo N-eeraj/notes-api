@@ -62,9 +62,9 @@ async def logout(http_request: Request):
         'message': 'Logout successfull'
     }
 
-# update password api
-@router.put('/update-password')
-async def update_password(http_request: Request, request: user_schemas.UpdatePassword):
+# change password api
+@router.put('/change-password')
+async def change_password(http_request: Request, request: user_schemas.UpdatePassword):
     # get user id from request headers
     user_details = get_user_details(http_request)
     user_id = user_details['user_id']

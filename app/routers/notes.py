@@ -34,8 +34,8 @@ async def read_note(id: int, http_request: Request):
     # get user id
     user_id = get_user_details(http_request)['user_id']
 
-    # fetch note details from notes table
-    note = note_controller.find_note(id, user_id)
+    # fetch note details from db
+    note = note_controller.find_note(id, user_id).one()
 
     # get note body
     body = note_controller.read_note_file(id)
@@ -51,9 +51,9 @@ async def read_note(id: int, http_request: Request):
         }
     }
 
-# edit note api
-@router.put('/edit/{id}')
-async def edit_note(id: int, request: note_schemas.Note, http_request: Request):
+# update note api
+@router.put('/update/{id}')
+async def update_note(id: int, request: note_schemas.Note, http_request: Request):
     # get user id
     user_id = get_user_details(http_request)['user_id']
 
@@ -67,4 +67,22 @@ async def edit_note(id: int, request: note_schemas.Note, http_request: Request):
     return {
         'success': True,
         'message': 'Note updated successfully'
-    } 
+    }
+
+# delete note api
+@router.delete('/delete/{id}')
+async def delete_note(id: int, http_request: Request):
+    # get user id
+    user_id = get_user_details(http_request)['user_id']
+
+    # delete entry from db
+    note_controller.delete_note_from_db(id, user_id)
+
+    # delete note file
+    note_controller.delete_note(id)
+
+    # return response
+    return {
+        'success': True,
+        'message': 'Note deleted successfully'
+    }
