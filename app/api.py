@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from .controllers import users as userControllers
 
 # import api routers
-from .routers import user
+from .routers import user, notes
 
 # load .env
 import os
@@ -29,7 +29,9 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
 app.include_router(user.router)
+app.include_router(notes.router)
 
 # exception handling
 @app.exception_handler(RequestValidationError)

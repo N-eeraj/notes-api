@@ -1,23 +1,24 @@
-# import apirouter
+# import apirouter and request
 from fastapi import APIRouter, Request
 
-# import schemas & controllers
+# import schemas & controller
 from ..schemas import users as userSchemas
-from ..controllers import users as userControllers
+from ..controllers import users as userController
 
+# import user details helper
 from ..utils import get_user_id
 
 # initialize router
-router = APIRouter()
+router = APIRouter(tags=['Users'])
 
 # login api
-@router.post('/login', tags=['Users'])
+@router.post('/login')
 async def login(request: userSchemas.Login):
     # validate user using users table
-    id = userControllers.validate_login(request.email, request.password)
+    id = userController.validate_login(request.email, request.password)
 
     # get bearer token
-    token = userControllers.get_bearer_token(id)
+    token = userController.get_bearer_token(id)
 
     # return success message
     return {
@@ -27,17 +28,17 @@ async def login(request: userSchemas.Login):
     }
 
 # register api
-@router.post('/register', tags=['Users'])
+@router.post('/register')
 async def register(request: userSchemas.Register):
     # check if email already exist in users table
-    userControllers.check_email_exist(request.email)
+    userController.check_email_exist(request.email)
 
     # encrypt password and save to users table
-    userControllers.create_user(request.email, request.password)
+    userController.create_user(request.email, request.password)
 
     # get bearer token
-    id = userControllers.validate_login(request.email, request.password)
-    token = userControllers.get_bearer_token(id)
+    id = userController.validate_login(request.email, request.password)
+    token = userController.get_bearer_token(id)
 
     # return response
     return {
@@ -47,13 +48,13 @@ async def register(request: userSchemas.Register):
     }
 
 # logout api
-@router.post('/logout', tags=['Users'])
+@router.post('/logout')
 async def logout(http_request: Request):
     # get token from request headers
     token = get_user_id(http_request)['token']
 
     # remove token from tokens table
-    userControllers.remove_token_by_token(token)
+    userController.remove_token_by_token(token)
 
     # return response
     return {
@@ -62,7 +63,7 @@ async def logout(http_request: Request):
     }
 
 # update password api
-@router.put('/update-password', tags=['Users'])
+@router.put('/update-password')
 async def update_password(http_request: Request, request: userSchemas.UpdatePassword):
     # get user id from request headers
     user_details = get_user_id(http_request)
@@ -70,13 +71,13 @@ async def update_password(http_request: Request, request: userSchemas.UpdatePass
     token = user_details['token']
 
     # validate old password
-    userControllers.validate_old_password(user_id, request.old_password)
+    userController.validate_old_password(user_id, request.old_password)
 
     # update new password in users table
-    userControllers.update_new_password(user_id, request.new_password)
+    userController.update_new_password(user_id, request.new_password)
 
     # remove all tokens of the users except current token
-    userControllers.remove_token_by_id(user_id, token)
+    userController.remove_token_by_id(user_id, token)
 
     # return response
     return {
