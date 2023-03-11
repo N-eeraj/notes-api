@@ -2,6 +2,8 @@
 from fastapi import HTTPException
 from sqlalchemy.orm.exc import NoResultFound
 from ..db import session
+
+# imports hashing and token generation
 import bcrypt
 import secrets
 
@@ -54,7 +56,7 @@ def check_token_exist(token):
 
 def get_bearer_token(id):
     # generate bearer token
-    jwt_token = secrets.token_hex(32)
+    jwt_token = secrets.token_hex(16)
 
     # if new token exists in tokens table generate new token and repeat
     if check_token_exist(jwt_token):

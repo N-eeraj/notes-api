@@ -6,7 +6,7 @@ from ..schemas import users as userSchemas
 from ..controllers import users as userController
 
 # import user details helper
-from ..utils import get_user_id
+from ..utils import get_user_details
 
 # initialize router
 router = APIRouter(tags=['Users'])
@@ -51,7 +51,7 @@ async def register(request: userSchemas.Register):
 @router.post('/logout')
 async def logout(http_request: Request):
     # get token from request headers
-    token = get_user_id(http_request)['token']
+    token = get_user_details(http_request)['token']
 
     # remove token from tokens table
     userController.remove_token_by_token(token)
@@ -66,7 +66,7 @@ async def logout(http_request: Request):
 @router.put('/update-password')
 async def update_password(http_request: Request, request: userSchemas.UpdatePassword):
     # get user id from request headers
-    user_details = get_user_id(http_request)
+    user_details = get_user_details(http_request)
     user_id = user_details['user_id']
     token = user_details['token']
 

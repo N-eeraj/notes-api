@@ -1,7 +1,7 @@
 from .controllers import users as userControllers
 
 # function to get user id & token from request header
-def get_user_id(request):
+def get_user_details(request):
     token = request.headers['authorization'][7:]
     user_id = userControllers.validate_token(token)
     return {
