@@ -55,6 +55,13 @@ def delete_note(id):
     # delete note file
     os.remove(f'notes/{id}.txt')
 
-def fetch_all_user_notes(user_id):
+def validate_page_number(page):
+    if page < 1:
+        raise HTTPException(status_code=422, detail={
+            'success': False,
+            'message': 'Invalid page number'
+        })
+
+def fetch_all_user_notes(user_id, page):
     # fetch all notes of a user
-    return session.query(Note).filter(Note.user_id==user_id).all()
+    return session.query(Note).filter(Note.user_id==user_id).order_by(Note.id.desc()).offset(5*(page-1)).limit(5).all()

@@ -12,12 +12,15 @@ router = APIRouter(prefix='/note' ,tags=['Notes'])
 
 # list all user notes
 @router.get('/list')
-async def list_notes(http_request: Request):
+async def list_notes(http_request: Request, page: int=1):
+    # validate page number
+    note_controller.validate_page_number(page)
+
     # get user id
     user_id = get_user_details(http_request)['user_id']
 
     # fetch all notes of the user
-    user_notes = note_controller.fetch_all_user_notes(user_id)
+    user_notes = note_controller.fetch_all_user_notes(user_id, page)
 
     # get all details to return
     notes = []
