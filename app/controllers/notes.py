@@ -3,6 +3,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm.exc import NoResultFound
 from ..db import session
 import os
+import math
 
 # model
 from ..models.notes import Note
@@ -56,12 +57,31 @@ def delete_note(id):
     os.remove(f'notes/{id}.txt')
 
 def validate_page_number(page):
+    # respond with error if page number is less than 1
     if page < 1:
         raise HTTPException(status_code=422, detail={
             'success': False,
             'message': 'Invalid page number'
         })
 
+def get_notes_count(user_id):
+    # find number of notes of given user from notes table
+    return session.query(Note).filter(Note.user_id==user_id).count()
+
+def check_page_existance(page, total_notes_count):
+    total_pages_count = math.ceil(total_notes_count/5)
+    if page > total_pages_count:
+        raise HTTPException(status_code=404, detail={
+            'success': False,
+            'message': f'Page {page} of notes list not found'
+        })
+
+
+
 def fetch_all_user_notes(user_id, page):
-    # fetch all notes of a user
-    return session.query(Note).filter(Note.user_id==user_id).order_by(Note.id.desc()).offset(5*(page-1)).limit(5).all()
+    # fetch all notes of a user from notes table
+    return session.query(Note)\
+        .filter(Note.user_id==user_id)\
+        .order_by(Note.id.desc())\
+        .offset(5*(page-1))\
+        .limit(5).all()

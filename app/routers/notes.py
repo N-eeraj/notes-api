@@ -19,6 +19,12 @@ async def list_notes(http_request: Request, page: int=1):
     # get user id
     user_id = get_user_details(http_request)['user_id']
 
+    # fetch number of notes of the user
+    total_notes_count = note_controller.get_notes_count(user_id)
+
+    # check if page number exists
+    note_controller.check_page_existance(page, total_notes_count)
+
     # fetch all notes of the user
     user_notes = note_controller.fetch_all_user_notes(user_id, page)
 
@@ -38,7 +44,10 @@ async def list_notes(http_request: Request, page: int=1):
     return {
         'success': True,
         'message': 'Notes fetched successfully',
-        'data': notes
+        'data': {
+            'notes': notes,
+            'total_count': total_notes_count
+        }
     }
 
 # create note api
