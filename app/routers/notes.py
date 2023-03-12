@@ -22,10 +22,13 @@ async def list_notes(http_request: Request):
     # get all details to return
     notes = []
     for note in user_notes:
+        body = note_controller.read_note_file(note.id)
+        if len(body) > 100:
+            body = f'{body[:100]}...'
         notes.append({
             'id': note.id,
             'title': note.title,
-            'body': note_controller.read_note_file(note.id)
+            'body': body
         })
 
     # return response
