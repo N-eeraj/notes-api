@@ -30,7 +30,7 @@ def validate_login(email, password):
     if not bcrypt.checkpw(bytes(password, 'utf-8'), result.password.encode('utf-8')):
         # respond with error if password is incorrect
         raise HTTPException(status_code=401, detail={
-            'success':False,
+            'success': False,
             'message': 'Incorrect password'
         })
     return result.id
@@ -103,7 +103,7 @@ def validate_old_password(id, password):
     if not bcrypt.checkpw(bytes(password, 'utf-8'), result.password.encode('utf-8')):
         # respond with error if password is incorrect
         raise HTTPException(status_code=401, detail={
-            'success':False,
+            'success': False,
             'message': 'Incorrect password'
         })
 

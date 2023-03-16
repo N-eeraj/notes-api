@@ -1,5 +1,5 @@
 # import basmodel & validator
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, EmailStr
 
 # import helper validator
 from ..utils import validate_not_empty
@@ -33,7 +33,7 @@ class Login(BaseModel):
 
 
 class Register(BaseModel):
-    email: str
+    email: EmailStr
     password: str
     confirm_password: str
 

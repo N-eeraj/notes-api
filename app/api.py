@@ -54,28 +54,6 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 async def http_exception_handler(request, exc):
     return JSONResponse(exc.detail, status_code=exc.status_code)
 
-# middleware to check bearer token
-@app.middleware("http")
-async def add_process_time_header(request: Request, call_next):
-    if request['path'] not in ['/docs', '/openapi.json', '/login', '/register', '/ping']:
-        headers = dict(request.headers)
-        if not validate_bearer_token(headers):
-            return JSONResponse(
-                status_code = 401,
-                content = jsonable_encoder({
-                    'message': 'User not logged in',
-                    'success': False
-                })
-            )
-    response = await call_next(request)
-    return response
-
-def validate_bearer_token(headers):
-    if 'authorization' not in headers.keys():
-        return False
-    token = headers['authorization'][7:]
-    return user_controllers.validate_token(token)
-
 # ping api
 @app.get('/ping', tags=['Test'])
 async def ping():

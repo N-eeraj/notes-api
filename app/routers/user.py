@@ -1,12 +1,12 @@
 # import apirouter and request
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends
 
 # import schemas & controller
 from ..schemas import users as user_schemas
 from ..controllers import users as user_controller
 
-# import user details helper
-from ..utils import get_user_details
+# import auth token validator
+from ..auth import verify_auth_token
 
 # initialize router
 router = APIRouter(tags=['Users'])
@@ -49,9 +49,9 @@ async def register(request: user_schemas.Register):
 
 # logout api
 @router.post('/logout')
-async def logout(http_request: Request):
+async def logout(user_details: dict = Depends(verify_auth_token)):
     # get token from request headers
-    token = get_user_details(http_request)['token']
+    token = user_details['token']
 
     # remove token from tokens table
     user_controller.remove_token_by_token(token)
@@ -64,9 +64,8 @@ async def logout(http_request: Request):
 
 # change password api
 @router.put('/change-password')
-async def change_password(http_request: Request, request: user_schemas.UpdatePassword):
+async def change_password(request: user_schemas.UpdatePassword, user_details: dict = Depends(verify_auth_token)):
     # get user id from request headers
-    user_details = get_user_details(http_request)
     user_id = user_details['user_id']
     token = user_details['token']
 
