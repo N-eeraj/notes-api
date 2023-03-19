@@ -70,7 +70,7 @@ def get_notes_count(user_id):
 
 def check_page_existance(page, total_notes_count):
     total_pages_count = math.ceil(total_notes_count/5)
-    if page > total_pages_count:
+    if total_pages_count and page > total_pages_count:
         raise HTTPException(status_code=404, detail={
             'success': False,
             'message': f'Page {page} of notes list not found'

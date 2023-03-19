@@ -13,7 +13,7 @@ router = APIRouter(prefix='/note', tags=['Notes'])
 
 # list all user notes
 @router.get('/list')
-async def list_notes(user_details: dict = Depends(verify_auth_token), page: int=1):
+async def list_notes(user_details: dict = Depends(verify_auth_token), page: int = 1):
     # validate page number
     note_controller.validate_page_number(page)
 
@@ -70,7 +70,7 @@ async def create_note(request: note_schemas.Note, user_details: dict = Depends(v
     }
 
 # read note api
-@router.get('/{id}')
+@router.get('/view/{id}')
 async def read_note(id: int, user_details: dict = Depends(verify_auth_token)):
     # get user id
     user_id = user_details['user_id']

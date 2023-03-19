@@ -63,7 +63,7 @@ async def logout(user_details: dict = Depends(verify_auth_token)):
     }
 
 # change password api
-@router.put('/change-password')
+@router.patch('/change-password')
 async def change_password(request: user_schemas.UpdatePassword, user_details: dict = Depends(verify_auth_token)):
     # get user id from request headers
     user_id = user_details['user_id']
